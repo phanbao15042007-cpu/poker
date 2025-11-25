@@ -1,76 +1,78 @@
 <!doctype html>
 <html lang="vi">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Mini Texas Hold'em — Poker trình diễn</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Xì Jack</title>
 <style>
-:root{--bg:#0b1320;--card:#ffffff;--accent:#f59e0b}
-body{margin:0;font-family:Inter,Segoe UI,Arial;background:linear-gradient(180deg,#071226 0%,#0d1b2a 100%);color:#e6eef8;display:flex;flex-direction:column;align-items:center;gap:12px;padding:18px}
-header{display:flex;gap:12px;align-items:center;position:relative}
-h1{margin:0;font-size:20px}
-.table{width:920px;max-width:96%;background:rgba(6,30,20,0.6);border-radius:12px;padding:18px;box-shadow:0 6px 24px rgba(0,0,0,0.6)}
-.controls{display:flex;gap:8px;align-items:center;margin-bottom:12px}
-button{background:var(--accent);border:none;padding:8px 12px;border-radius:8px;color:#071226;font-weight:700;cursor:pointer}
-.row{display:flex;gap:12px;align-items:center}
-.players{display:flex;gap:8px;flex-wrap:wrap}
-.player{background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01));padding:8px;border-radius:8px;min-width:150px;position:relative}
-.player h3{margin:0;font-size:14px}
-.cards{display:flex;gap:6px;margin-top:8px}
-.card{width:44px;height:60px;border-radius:6px;background:var(--card);color:#071226;display:flex;flex-direction:column;justify-content:space-between;padding:6px;font-weight:700;box-shadow:0 4px 10px rgba(0,0,0,0.4)}
+body{background:#0b1320;color:#e6eef8;font-family:Arial,sans-serif;display:flex;flex-direction:column;align-items:center;padding:20px;}
+h1{margin:0 0 12px 0}
+.table{background:rgba(6,30,20,0.8);padding:20px;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,0.6);width:360px;}
+.cards{display:flex;gap:6px;margin:12px 0;}
+.card{width:60px;height:90px;border-radius:6px;background:white;display:flex;flex-direction:column;justify-content:space-between;padding:6px;font-weight:700;box-shadow:0 4px 10px rgba(0,0,0,0.4);transition:transform 0.3s;transform: translateY(-50px);opacity:0;}
+.card.show{transform:translateY(0);opacity:1;}
 .card.back{background:linear-gradient(135deg,#0b63a8,#0f1724);color:#fff}
-.board{display:flex;gap:8px;justify-content:center;margin:16px 0}
-.log{max-height:140px;overflow:auto;background:rgba(255,255,255,0.02);padding:8px;border-radius:8px;font-size:13px}
-footer{font-size:12px;opacity:0.8}
-.chips{font-weight:800;position:absolute;top:6px;right:6px;background:rgba(245,158,11,0.8);color:#071226;padding:2px 6px;border-radius:6px;font-size:12px}
-.status{margin-left:auto;color:#cbd5e1}
-#dealerBtn{position:absolute;top:12px;right:12px;background:#f59e0b;color:#071226;padding:6px 10px;border-radius:8px;font-weight:700;z-index:2}
+.player-info{display:flex;justify-content:space-between;align-items:center;}
+button{background:#f59e0b;border:none;padding:8px 12px;border-radius:6px;color:#071226;font-weight:700;cursor:pointer;margin:4px 0;}
+input[type=number]{width:60px;padding:4px;border-radius:4px;border:none;margin-left:4px;}
+.log{margin-top:12px;background:rgba(255,255,255,0.02);padding:8px;border-radius:8px;font-size:13px;max-height:100px;overflow:auto;}
 </style>
 </head>
 <body>
-<header>
-<h1>Mini Texas Hold'em — phiên bản demo</h1>
-<div id="dealerBtn">Dealer: ?</div>
-<div class="status">Phiên: local — không phải để chơi tiền thật</div>
-</header>
+<h1>Blackjack Demo — Split & Double & Bet</h1>
 <div class="table">
-<div class="controls row">
-<label>Số người (kể bạn):</label>
-<select id="numPlayers">
-<option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option>
-</select>
-<button id="startBtn">Bắt đầu ván mới</button>
-<button id="nextBtn">Tiến đến bước</button>
-<button onclick="playerBet()">Cược 50</button>
-<button onclick="playerFold()">Bỏ bài</button>
-<div class="status chips">Mức cược: <span id="pot">0</span> chips</div>
+<div class="player-info"><div>Dealer</div><div>Points: <span id="dealerPoints">0</span></div></div>
+<div class="cards" id="dealerCards"></div>
+<hr>
+<div class="player-info"><div>You</div><div>Chips: <span id="playerChips">1000</span></div></div>
+<div class="cards" id="playerCards"></div>
+<div class="player-info"><div>Points: <span id="playerPoints">0</span></div><div>Pot: <span id="pot">0</span></div></div>
+<div class="player-info"><div>Set Bet:</div><input type="number" id="betInput" value="50" min="1"></div>
+<button id="btnDeal">Deal</button>
+<button id="btnHit">Hit</button>
+<button id="btnStand">Stand</button>
+<button id="btnDouble">Double</button>
+<button id="btnSplit">Split</button>
+<div class="log" id="log"></div>
 </div>
-<div class="board" id="boardArea"></div>
-<div class="row">
-<div style="flex:1"><div class="players" id="playersArea"></div></div>
-<div style="width:320px"><div class="log" id="log"></div></div>
-</div>
-</div>
-<footer>Demo học tập — không dùng cho mục đích cá cược thực tế.</footer>
 <script>
-const SUITS=['♠','♥','♦','♣'],RANKS=['2','3','4','5','6','7','8','9','T','J','Q','K','A'];
-function makeDeck(){const d=[];for(const s of SUITS) for(const r of RANKS)d.push(r+s);return d;}
+const SUITS=['♠','♥','♦','♣'],RANKS=['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+let deck=[],player=[],dealer=[],splitHand=[],usingSplit=false,playerChips=1000,pot=0;
+const playerCardsEl=document.getElementById('playerCards'),dealerCardsEl=document.getElementById('dealerCards');
+const playerPointsEl=document.getElementById('playerPoints'),dealerPointsEl=document.getElementById('dealerPoints');
+const logEl=document.getElementById('log'),playerChipsEl=document.getElementById('playerChips'),potEl=document.getElementById('pot');
+const betInput=document.getElementById('betInput');
+
+function makeDeck(){let d=[];for(const s of SUITS)for(const r of RANKS)d.push(r+s);return d;}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}}
-const playersArea=document.getElementById('playersArea'),boardArea=document.getElementById('boardArea'),logEl=document.getElementById('log'),potEl=document.getElementById('pot'),startBtn=document.getElementById('startBtn'),nextBtn=document.getElementById('nextBtn'),numPlayersSel=document.getElementById('numPlayers');
-let deck=[],players=[],community=[],stage=0,dealer=0,pot=0;
-function log(t){const p=document.createElement('div');p.textContent=t;logEl.prepend(p);}
-function startGame(){deck=makeDeck();shuffle(deck);players=[];community=[];stage=0;pot=0;potEl.textContent='0';logEl.innerHTML='';const n=parseInt(numPlayersSel.value,10);for(let i=0;i<n;i++)players.push({id:i,name:i===0?'You':`CPU ${i}`,chips:1000,hole:[],folded:false,current:0});dealer=(dealer+1)%n;document.getElementById('dealerBtn').textContent='Dealer: '+dealer;for(let p of players)p.hole=[deck.pop(),deck.pop()];render();log('Đã chia bài.');}
-function render(){boardArea.innerHTML='';for(let c of community)boardArea.appendChild(cardEl(c));playersArea.innerHTML='';for(const p of players){const el=document.createElement('div');el.className='player';const name=document.createElement('h3');name.textContent=p.name;el.appendChild(name);const chipEl=document.createElement('div');chipEl.className='chips';chipEl.textContent=p.chips+' chips';el.appendChild(chipEl);const cards=document.createElement('div');cards.className='cards';if(p.id===0||stage>=4){cards.appendChild(cardEl(p.hole[0]));cards.appendChild(cardEl(p.hole[1]));}else{cards.appendChild(cardBack());cards.appendChild(cardBack());}el.appendChild(cards);playersArea.appendChild(el);}}
-function cardEl(c){const e=document.createElement('div');e.className='card';const r=c.slice(0,1),s=c.slice(1);e.innerHTML=`<div>${r}</div><div style="text-align:right">${s}</div>`;return e;}
-function cardBack(){const e=document.createElement('div');e.className='card back';return e;}
-function nextStep(){if(stage===0){burn();community.push(deck.pop(),deck.pop(),deck.pop());stage=1;log('Flop revealed.');cpuBet();}else if(stage===1){burn();community.push(deck.pop());stage=2;log('Turn revealed.');cpuBet();}else if(stage===2){burn();community.push(deck.pop());stage=3;log('River revealed.');cpuBet();}else if(stage===3){stage=4;log('Showdown!');determineWinner();}else log('Ván đã kết thúc.');render();}
-function burn(){deck.pop();}
-function playerFold(){players[0].folded=true;log('Bạn bỏ bài!');render();}
-function playerBet(){if(players[0].chips>=50){players[0].chips-=50;pot+=50;potEl.textContent=pot;log('Bạn cược 50 chips');render();cpuBet();}}
-function cpuBet(){for(let i=1;i<players.length;i++){if(!players[i].folded){let amt=Math.min(50,players[i].chips);players[i].chips-=amt;pot+=amt;potEl.textContent=pot;log(players[i].name+' cược '+amt+' chips');}}render();}
-function evaluate7(c){return {score:0,desc:'Demo'}}
-function determineWinner(){const alive=players.filter(p=>!p.folded);log('Ván kết thúc!');if(alive.length===1)log('Người thắng: '+alive[0].name);}
-startBtn.addEventListener('click',startGame);nextBtn.addEventListener('click',nextStep);startGame();
+function drawCard(){return deck.pop();}
+function cardEl(code){const el=document.createElement('div');el.className='card';el.textContent=code;
+if(code.includes('♥')||code.includes('♦')) el.style.color='red'; else el.style.color='black';
+setTimeout(()=>el.classList.add('show'),50);return el;}
+function handPoints(hand){let sum=0,aces=0;for(const c of hand){let r=c.slice(0,-1);if(r==='J'||r==='Q'||r==='K')sum+=10;else if(r==='A'){sum+=11;aces++;}else sum+=parseInt(r,10);}while(sum>21&&aces>0){sum-=10;aces--;}return sum;}
+function renderHands(showDealer=false){playerCardsEl.innerHTML='';let hands=[player];if(usingSplit)hands.push(splitHand);for(const h of hands){for(const c of h)playerCardsEl.appendChild(cardEl(c));playerCardsEl.appendChild(document.createElement('br'));}
+playerPointsEl.textContent=handPoints(player);dealerCardsEl.innerHTML='';if(showDealer){for(const c of dealer)dealerCardsEl.appendChild(cardEl(c));dealerPointsEl.textContent=handPoints(dealer);}else{dealerCardsEl.appendChild(cardEl(dealer[0]));let back=cardEl('??');back.className='card back show';dealerCardsEl.appendChild(back);dealerPointsEl.textContent='?';}}
+function log(msg){const p=document.createElement('div');p.textContent=msg;logEl.prepend(p);}
+
+function startDeal(){let bet=parseInt(betInput.value);if(isNaN(bet)||bet<1)bet=50;if(playerChips<bet){log('Không đủ chips!');return;}deck=makeDeck();shuffle(deck);player=[];dealer=[];splitHand=[];usingSplit=false;pot=bet;playerChips-=bet;playerChipsEl.textContent=playerChips;potEl.textContent=pot;
+player.push(drawCard(),drawCard());dealer.push(drawCard(),drawCard());log('Chia bài xong.');renderHands();}
+function playerHit(){player.push(drawCard());renderHands();if(handPoints(player)>21){log('Bạn bù! Busted!');setTimeout(endRound,600);}}
+function playerStand(){while(handPoints(dealer)<17)dealer.push(drawCard());renderHands(true);setTimeout(endRound,600);}
+function playerDouble(){let bet=parseInt(betInput.value); if(playerChips>=pot){playerChips-=pot;pot*=2;player.push(drawCard());log('Double! X2 Bet');renderHands();playerPointsEl.textContent=handPoints(player);setTimeout(playerStand,600);}}
+function playerSplit(){if(player.length===2&&player[0].slice(0,-1)===player[1].slice(0,-1)&&playerChips>=pot){playerChips-=pot;splitHand.push(player.pop());usingSplit=true;player.push(drawCard());splitHand.push(drawCard());log('Split!');renderHands();}}
+
+function endRound(){let playerScore=handPoints(player),dealerScore=handPoints(dealer);
+if(playerScore>21)log('Bạn thua!');
+else if(dealerScore>21||playerScore>dealerScore){log('Bạn thắng!');playerChips+=pot*2;} 
+else if(playerScore===dealerScore) {log('Hòa!');playerChips+=pot;}
+else log('Bạn thua!');playerChipsEl.textContent=playerChips;renderHands(true);setTimeout(resetTable,1500);}
+function resetTable(){player=[];splitHand=[];usingSplit=false;dealer=[];pot=0;potEl.textContent=pot;playerPointsEl.textContent=0;dealerPointsEl.textContent=0;playerCardsEl.innerHTML='';dealerCardsEl.innerHTML='';log('Bàn đã reset. Nhấn Deal để ván mới.');}
+
+document.getElementById('btnDeal').addEventListener('click',startDeal);
+document.getElementById('btnHit').addEventListener('click',playerHit);
+document.getElementById('btnStand').addEventListener('click',playerStand);
+document.getElementById('btnDouble').addEventListener('click',playerDouble);
+document.getElementById('btnSplit').addEventListener('click',playerSplit);
 </script>
 </body>
 </html>
